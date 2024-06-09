@@ -28,7 +28,7 @@ TEST(Hex, to_bytes)
     result = hex::to_bytes(s);
     EXPECT_EQ(result, expected);
 
-    result = hex::to_bytes(s.begin(), s.begin()+5);
+    result = hex::to_bytes(s.begin(), s.begin()+4);
     expected = {0, 1};
     EXPECT_EQ(result, expected);
 }
