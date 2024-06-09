@@ -27,6 +27,10 @@ TEST(Hex, to_bytes)
     expected = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
     result = hex::to_bytes(s);
     EXPECT_EQ(result, expected);
+
+    result = hex::to_bytes(s.begin(), s.begin()+5);
+    expected = {0, 1};
+    EXPECT_EQ(result, expected);
 }
 
 int main(int argc, char *argv[])
