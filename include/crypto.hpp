@@ -120,19 +120,3 @@ template <typename T> bytes from_bytes(const T &t)
     return from_bytes(std::begin(t), std::end(t));
 }
 } // namespace base64
-
-bytes fixedXOR(bytes &b1, bytes &b2)
-{
-    if (b1.size() != b2.size())
-    {
-        throw std::logic_error("Buffers are not of equal size");
-    }
-    auto b1_iter = b1.begin();
-    auto b2_iter = b2.begin();
-    bytes result;
-    for (; b1_iter != b1.end() && b2_iter != b2.end(); ++b1_iter, ++b2_iter)
-    {
-        result.push_back(*b1_iter ^ *b2_iter);
-    }
-    return result;
-}
