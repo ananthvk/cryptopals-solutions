@@ -17,7 +17,7 @@ TEST(Hex, to_bytes)
     bytes expected = {10, 255, 226};
     auto result = hex::to_bytes(s);
     EXPECT_EQ(result, expected);
-    
+
     s = "00aae20fbcae01234567890abcdeff";
     expected = {0, 170, 226, 15, 188, 174, 1, 35, 69, 103, 137, 10, 188, 222, 255};
     result = hex::to_bytes(s);
@@ -28,8 +28,41 @@ TEST(Hex, to_bytes)
     result = hex::to_bytes(s);
     EXPECT_EQ(result, expected);
 
-    result = hex::to_bytes(s.begin(), s.begin()+4);
+    result = hex::to_bytes(s.begin(), s.begin() + 4);
     expected = {0, 1};
+    EXPECT_EQ(result, expected);
+}
+
+TEST(Base64, from_bytes_empty) { EXPECT_EQ(hex::to_bytes(std::string("")), bytes()); }
+
+TEST(Base64, from_bytes_simple)
+{
+    std::string s = "Man";
+    bytes expected = {'T', 'W', 'F', 'u'};
+    auto result = base64::from_bytes(s);
+    EXPECT_EQ(result, expected);
+
+    s = "M";
+    expected = {'T', 'Q', '=', '='};
+    result = base64::from_bytes(s);
+    EXPECT_EQ(result, expected);
+
+    s = "Ma";
+    expected = {'T', 'W', 'E', '='};
+    result = base64::from_bytes(s);
+    EXPECT_EQ(result, expected);
+
+    s = "The quick brown fox jumps over the lazy dogs";
+    expected = {86,  71,  104, 108, 73,  72,  70,  49,  97,  87,  78,  114, 73,  71,  74,
+                121, 98,  51,  100, 117, 73,  71,  90,  118, 101, 67,  66,  113, 100, 87,
+                49,  119, 99,  121, 66,  118, 100, 109, 86,  121, 73,  72,  82,  111, 90,
+                83,  66,  115, 89,  88,  112, 53,  73,  71,  82,  118, 90,  51,  77,  61};
+    result = base64::from_bytes(s);
+    EXPECT_EQ(result, expected);
+
+    bytes b = {0};
+    expected = {'A', 'A', '=', '='};
+    result = base64::from_bytes(b);
     EXPECT_EQ(result, expected);
 }
 

@@ -6,7 +6,11 @@ else
 endif
 
 gtest_dep = dependency('gtest')
-srcs = ['test_crypto']
+srcs = [
+    'test_crypto',
+    'set1/challenge1',
+    'set1/challenge2'
+]
 
 foreach s : srcs 
     e = executable(

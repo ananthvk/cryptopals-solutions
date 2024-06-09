@@ -53,11 +53,86 @@ template <typename Iter> bytes to_bytes(const Iter begin, const Iter end)
     return decoded;
 }
 
-// Note: Don't use it directly with raw string literals (const char*) since the terminating null character is also considered
+// Note: Don't use it directly with raw string literals (const char*) since the terminating null
+// character is also considered
 template <typename T> bytes to_bytes(const T &t) { return to_bytes(std::begin(t), std::end(t)); }
 
 } // namespace hex
 
 namespace base64
 {
+// [chr(i) for i in list(range(65, 91)) + list(range(97,123)) + list(range(48, 58))] + ['+', '/']
+const static byte ENCODE_TABLE[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                                    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                                    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+
+template <typename Iter> bytes from_bytes(Iter begin, Iter end)
+{
+    bytes encoded;
+
+    if (begin == end)
+        return encoded;
+
+    // Read groups of three bytes (24 bits) and convert them to four base64 characters
+    // If the last group contains less than three bytes, apply padding
+    byte b1, b2, b3;
+    while (true)
+    {
+        b1 = static_cast<byte>(*begin++);
+        encoded.push_back(ENCODE_TABLE[(b1 >> 2)]);
+        if (begin == end)
+        {
+            // Only one byte found, this is the last block
+            // Get the two LSB of the first byte
+            encoded.push_back(ENCODE_TABLE[(b1 & 0x3) << 4]);
+            encoded.push_back('=');
+            encoded.push_back('=');
+            break;
+        }
+
+        b2 = static_cast<byte>(*begin++);
+        encoded.push_back(ENCODE_TABLE[((b1 & 0x3) << 4) | (b2 >> 4)]);
+        if (begin == end)
+        {
+            // Two bytes found, this is the last block
+            encoded.push_back(ENCODE_TABLE[((b2 & 0xf) << 2)]);
+            encoded.push_back('=');
+            break;
+        }
+
+        b3 = static_cast<byte>(*begin++);
+        encoded.push_back(ENCODE_TABLE[((b2 & 0xf) << 2) | (b3 >> 6)]);
+        encoded.push_back(ENCODE_TABLE[(b3 & 0x3f)]);
+        if (begin == end)
+        {
+            // Three bytes found, this is the last block
+            break;
+        }
+        // There are more blocks
+    }
+    return encoded;
+}
+
+template <typename T> bytes from_bytes(const T &t)
+{
+    return from_bytes(std::begin(t), std::end(t));
+}
+} // namespace base64
+
+bytes fixedXOR(bytes &b1, bytes &b2)
+{
+    if (b1.size() != b2.size())
+    {
+        throw std::logic_error("Buffers are not of equal size");
+    }
+    auto b1_iter = b1.begin();
+    auto b2_iter = b2.begin();
+    bytes result;
+    for (; b1_iter != b1.end() && b2_iter != b2.end(); ++b1_iter, ++b2_iter)
+    {
+        result.push_back(*b1_iter ^ *b2_iter);
+    }
+    return result;
 }
