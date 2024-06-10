@@ -52,11 +52,15 @@ int main(int argc, char *argv[])
     {
         if (strcmp(argv[1], "encrypt") == 0)
         {
-            std::string plaintext, key;
-            std::cout << "Enter plaintext: ";
-            std::getline(std::cin, plaintext);
+            std::string plaintext, key, line;
             std::cout << "Enter key: ";
             std::getline(std::cin, key);
+            std::cout << "Enter plaintext: (ctrl + d to stop):";
+
+            while (std::getline(std::cin, line))
+            {
+                plaintext += line + '\n';
+            }
 
             auto ciphertext = repeating_key_XOR(plaintext, key);
             ciphertext = hex::from_bytes(ciphertext);
@@ -65,10 +69,10 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[1], "decrypt") == 0)
         {
             std::string ciphertext, key;
-            std::cout << "Enter ciphertext (hex encoded): ";
-            std::getline(std::cin, ciphertext);
             std::cout << "Enter key: ";
             std::getline(std::cin, key);
+            std::cout << "Enter ciphertext (hex encoded): ";
+            std::getline(std::cin, ciphertext);
 
             auto ciphertext_b = hex::to_bytes(ciphertext);
             auto plaintext = repeating_key_XOR(ciphertext_b, key);

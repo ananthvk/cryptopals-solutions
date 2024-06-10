@@ -1,8 +1,8 @@
 #pragma once
+#include <ostream>
 #include <stdexcept>
 #include <stdint.h>
 #include <string>
-#include<ostream>
 #include <vector>
 
 using byte = uint8_t;
@@ -152,9 +152,27 @@ std::ostream &operator<<(std::ostream &os, const bytes &bytestr)
             os << static_cast<char>(byt);
         else
         {
-            os << '\\' << 'x' 
-               << static_cast<char>(hex::DECODE_TABLE[(byt) >> 4])
-               << static_cast<char>(hex::DECODE_TABLE[(byt) & 0xf]);
+            if (byt == ' ')
+            {
+                os << " ";
+            }
+            else if (byt == '\n')
+            {
+                os << "\\n";
+            }
+            else if (byt == '\t')
+            {
+                os << "\\t";
+            }
+            else if (byt == '\r')
+            {
+                os << "\\r";
+            }
+            else
+            {
+                os << '\\' << 'x' << static_cast<char>(hex::DECODE_TABLE[(byt) >> 4])
+                   << static_cast<char>(hex::DECODE_TABLE[(byt) & 0xf]);
+            }
         }
     }
     return os;
