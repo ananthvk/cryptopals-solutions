@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
             auto ciphertext = repeating_key_XOR(plaintext, key);
             ciphertext = hex::from_bytes(ciphertext);
             std::cout << "Ciphertext: " << ciphertext << std::endl;
+            return 0;
         }
         else if (strcmp(argv[1], "decrypt") == 0)
         {
@@ -77,12 +78,8 @@ int main(int argc, char *argv[])
             auto ciphertext_b = hex::to_bytes(ciphertext);
             auto plaintext = repeating_key_XOR(ciphertext_b, key);
             std::cout << "Plaintext: " << plaintext << std::endl;
+            return 0;
         }
-        else
-        {
-            std::cerr << "Usage: ./challenge5 encrypt|decrypt" << std::endl;
-        }
-        return 0;
     }
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
