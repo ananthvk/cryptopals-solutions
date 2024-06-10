@@ -1,6 +1,7 @@
 #include "crypto.hpp"
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 // Contains the frequency distribution for letters in english,
 // characters with lower index are more frequent
@@ -64,7 +65,7 @@ bytes single_byte_XOR(const bytes &plaintext, byte key)
     return ciphertext;
 }
 
-std::string decode(const std::string &hexstring, int &key, int &calculated_score)
+bytes decode(const std::string &hexstring, int &key, int &calculated_score)
 {
     auto byts = hex::to_bytes(hexstring);
     int max_score = 0;
@@ -83,30 +84,32 @@ std::string decode(const std::string &hexstring, int &key, int &calculated_score
         }
     }
 
-    std::string plaintext;
-    std::copy(english_plaintext.begin(), english_plaintext.end(), std::back_inserter(plaintext));
     calculated_score = max_score;
-    return plaintext;
+    return english_plaintext;
 }
 
 int main(int argc, char *argv[])
 {
+    std::string filename;
     if (argc != 2)
     {
-        std::cerr << "Usage: ./challenge4 <filename>" << std::endl;
-        return 1;
+        filename = "challenge4.txt";
     }
-    std::ifstream ifs(argv[1]);
+    else
+    {
+        filename = argv[1];
+    }
+    std::ifstream ifs(filename);
     if (!ifs)
     {
-        std::cout << "Could not open " << argv[1] << std::endl;
+        std::cout << "Could not open " << filename << std::endl;
     }
     build_score_table();
     std::string line;
 
     int max_score = 0;
     int max_score_key = 0;
-    std::string possible_plaintext;
+    bytes possible_plaintext;
     std::string possible_ciphertext;
 
     while (std::getline(ifs, line))
@@ -123,6 +126,10 @@ int main(int argc, char *argv[])
     }
     std::cout << "Among the given lines, " << std::endl;
     std::cout << possible_ciphertext << std::endl;
-    std::cout << "Is likely to be XOR encrypted with key " << max_score_key << " and has a score " << max_score << std::endl;
-    std::cout << "Plaintext: " << possible_plaintext << std::endl;
+    std::cout << "Is likely to be XOR encrypted with key " << max_score_key << " and has a score "
+              << max_score << std::endl;
+    std::cout << "Plaintext: ";
+    std::copy(possible_plaintext.begin(), possible_plaintext.end(),
+              std::ostream_iterator<byte>(std::cout));
+    std::cout << std::endl;
 }
