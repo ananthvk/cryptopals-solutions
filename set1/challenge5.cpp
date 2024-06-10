@@ -48,6 +48,38 @@ TEST(Challenge5, solution)
 
 int main(int argc, char *argv[])
 {
+    if (argc >= 2)
+    {
+        if (strcmp(argv[1], "encrypt") == 0)
+        {
+            std::string plaintext, key;
+            std::cout << "Enter plaintext: ";
+            std::getline(std::cin, plaintext);
+            std::cout << "Enter key: ";
+            std::getline(std::cin, key);
+
+            auto ciphertext = repeating_key_XOR(plaintext, key);
+            ciphertext = hex::from_bytes(ciphertext);
+            std::cout << "Ciphertext: " << ciphertext << std::endl;
+        }
+        else if (strcmp(argv[1], "decrypt") == 0)
+        {
+            std::string ciphertext, key;
+            std::cout << "Enter ciphertext (hex encoded): ";
+            std::getline(std::cin, ciphertext);
+            std::cout << "Enter key: ";
+            std::getline(std::cin, key);
+
+            auto ciphertext_b = hex::to_bytes(ciphertext);
+            auto plaintext = repeating_key_XOR(ciphertext_b, key);
+            std::cout << "Plaintext: " << plaintext << std::endl;
+        }
+        else
+        {
+            std::cerr << "Usage: ./challenge5 encrypt|decrypt" << std::endl;
+        }
+        return 0;
+    }
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
