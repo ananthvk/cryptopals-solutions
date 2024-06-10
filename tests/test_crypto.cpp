@@ -1,6 +1,16 @@
 #include "crypto.hpp"
 #include "gtest/gtest.h"
 
+TEST(Hex, from_bytes_empty) { EXPECT_EQ(hex::from_bytes(bytes()), bytes()); }
+
+TEST(Hex, from_bytes)
+{
+    bytes b = {132, 15, 0, 1, 4, 12, 13, 255};
+    bytes expected = {'8', '4', '0', 'f', '0', '0', '0', '1', '0', '4', '0', 'c', '0', 'd', 'f', 'f'};
+    auto hexed = hex::from_bytes(b);
+    EXPECT_EQ(hexed, expected);
+}
+
 TEST(Hex, to_bytes_empty) { EXPECT_EQ(hex::to_bytes(std::string("")), bytes()); }
 
 TEST(Hex, to_bytes_error)

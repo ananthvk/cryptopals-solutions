@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <stdint.h>
 #include <string>
+#include<ostream>
 #include <vector>
 
 using byte = uint8_t;
@@ -12,6 +13,26 @@ using bytes = std::vector<uint8_t>;
 
 namespace hex
 {
+// Converts a sequence of bytes to hexadecimal
+const static byte DECODE_TABLE[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                                    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+template <typename Iter> bytes from_bytes(Iter begin, Iter end)
+{
+    bytes result;
+    for (; begin != end; begin++)
+    {
+        result.push_back(DECODE_TABLE[(*begin) >> 4]);
+        result.push_back(DECODE_TABLE[(*begin) & 0xf]);
+    }
+    return result;
+}
+
+template <typename T> bytes from_bytes(const T &t)
+{
+    return from_bytes(std::begin(t), std::end(t));
+}
+
 // This function converts a hex string from [begin, end)
 template <typename Iter> bytes to_bytes(const Iter begin, const Iter end)
 {
@@ -120,3 +141,21 @@ template <typename T> bytes from_bytes(const T &t)
     return from_bytes(std::begin(t), std::end(t));
 }
 } // namespace base64
+
+// Convenience function to display bytes, displays non printable characters using the \x notation
+
+std::ostream &operator<<(std::ostream &os, const bytes &bytestr)
+{
+    for (const auto &byt : bytestr)
+    {
+        if (isprint(byt))
+            os << static_cast<char>(byt);
+        else
+        {
+            os << '\\' << 'x' 
+               << static_cast<char>(hex::DECODE_TABLE[(byt) >> 4])
+               << static_cast<char>(hex::DECODE_TABLE[(byt) & 0xf]);
+        }
+    }
+    return os;
+}
