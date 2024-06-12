@@ -93,9 +93,6 @@ int main()
     }
     // EVP_CIPHER_CTX_set_padding(ctx, 0);
 
-    unsigned char encrypted[] = {9,   18,  48, 170, 222, 62,  179, 48,
-                                 219, 170, 67, 88,  248, 141, 42,  108};
-
     unsigned char plaintext[17] = {0};
     int len;
 
