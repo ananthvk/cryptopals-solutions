@@ -34,6 +34,8 @@ else
 endif
 
 gtest_dep = dependency('gtest')
+openssl_dep = dependency('openssl')
+
 srcs = [
     'challenge1',
     'challenge2',
@@ -48,7 +50,7 @@ foreach s : srcs
     e = executable(
         s,
         sources: ['set1/' + s + '.cpp'],
-        dependencies: [gtest_dep],
+        dependencies: [gtest_dep, openssl_dep],
         include_directories: ['include'],
         cpp_args: extra_args,
     )

@@ -111,4 +111,6 @@ int main()
     if (1 != EVP_DecryptFinal_ex(ctx, plaintext, &len))
         handleErrors();
     std::cout << bytes(plaintext, plaintext + len);
+    
+    EVP_CIPHER_CTX_free(ctx);
 }
