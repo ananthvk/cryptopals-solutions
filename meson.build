@@ -40,7 +40,8 @@ srcs = [
     'challenge3',
     'challenge4',
     'challenge5',
-    'challenge6'
+    'challenge6',
+    'challenge7'
 ]
 
 foreach s : srcs
