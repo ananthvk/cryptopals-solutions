@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
     if (!ifs)
     {
         std::cout << "Could not open " << filename << std::endl;
+        return 1;
     }
     build_score_table();
     std::string line;
