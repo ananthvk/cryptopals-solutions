@@ -192,21 +192,85 @@ bytes aes128_decrypt_cbc(const bytes &ciphertext, const bytes &key, const bytes 
     return unpad_pkcs7(plaintext_full, 16);
 }
 
-int main(int argc, char *argv[])
+TEST(AES_CBC, EncryptionAndDecryption)
 {
-    std::string line;
-    std::cout << "Enter plaintext: ";
-    std::getline(std::cin, line);
-    std::string plaintext_s = line;
+    std::string plaintext_s = "HERE IS AN EXAMPLE STRING";
     auto plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
     bytes key = {'Y', 'E', 'L', 'L', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
     bytes iv(16, 0);
     auto ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
-    std::cout << hex::from_bytes(ciphertext) << std::endl;
-    auto plain = aes128_decrypt_cbc(ciphertext, key, iv);
-    std::cout << plain << std::endl;
+    auto decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+    ASSERT_EQ(plaintext, decrypted);
 
-    std::cout << aes128_decrypt_cbc(hex::to_bytes(challenge_ciphertext), key, iv);
+    // Empty string
+    plaintext_s = "";
+    plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    key = {'Y', 'E', 'L', 'L', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    iv = bytes(16, 0);
+    ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+    ASSERT_EQ(plaintext, decrypted);
+
+    // Single character
+    plaintext_s = "S";
+    plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    key = {'Y', 'E', 'L', 'L', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    iv = bytes(16, 0);
+    ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+    ASSERT_EQ(plaintext, decrypted);
+
+    // Multiple characters
+    plaintext_s = "THE QUICK";
+    plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    key = {'Y', 'E', 'L', 'L', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    iv = bytes(16, 0);
+    ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+    ASSERT_EQ(plaintext, decrypted);
+
+    plaintext_s = "0123456789abcdef";
+    plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    key = {'Y', 'E', 'L', 'L', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    iv = bytes(16, 0);
+    ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+    ASSERT_EQ(plaintext, decrypted);
+
+    plaintext_s = "0123456789abcdef0123456789abcdef";
+    plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    key = {'B', 'L', 'U', 'E', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    iv = bytes(16, 2);
+    ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+
+    // Long string
+    plaintext_s = "The quick brown fox jumps over the lazy dogs the quick brown fox jumps over the "
+                  "lazy dogs the quick brown fox jumps over the lazy dogs";
+    plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    key = {'B', 'L', 'U', 'E', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    iv = bytes(16, 2);
+    ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    decrypted = aes128_decrypt_cbc(ciphertext, key, iv);
+    ASSERT_EQ(plaintext, decrypted);
+    ASSERT_EQ(plaintext, decrypted);
+}
+
+int main(int argc, char *argv[])
+{
+    // std::string line;
+    // std::cout << "Enter plaintext: ";
+    // std::getline(std::cin, line);
+    // std::string plaintext_s = line;
+    // auto plaintext = bytes(plaintext_s.begin(), plaintext_s.end());
+    // bytes key = {'Y', 'E', 'L', 'L', 'O', 'W', ' ', 'S', 'U', 'B', 'M', 'A', 'R', 'I', 'N', 'E'};
+    // bytes iv(16, 0);
+    // auto ciphertext = aes128_encrypt_cbc(plaintext, key, iv);
+    // std::cout << hex::from_bytes(ciphertext) << std::endl;
+    // auto plain = aes128_decrypt_cbc(ciphertext, key, iv);
+    // std::cout << plain << std::endl;
+
+    // std::cout << aes128_decrypt_cbc(hex::to_bytes(challenge_ciphertext), key, iv);
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
