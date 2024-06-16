@@ -45,3 +45,4 @@ t = executable(
 test('test_crypto', t, workdir: meson.current_source_dir())
 
 subdir('set1')
+subdir('set2')

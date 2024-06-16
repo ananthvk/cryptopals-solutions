@@ -17,7 +17,7 @@ namespace hex
 const static byte DECODE_TABLE[] = {'0', '1', '2', '3', '4', '5', '6', '7',
                                     '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-template <typename Iter> bytes from_bytes(Iter begin, Iter end)
+template <typename Iter> inline bytes from_bytes(Iter begin, Iter end)
 {
     bytes result;
     for (; begin != end; begin++)
@@ -28,13 +28,13 @@ template <typename Iter> bytes from_bytes(Iter begin, Iter end)
     return result;
 }
 
-template <typename T> bytes from_bytes(const T &t)
+template <typename T> inline bytes from_bytes(const T &t)
 {
     return from_bytes(std::begin(t), std::end(t));
 }
 
 // This function converts a hex string from [begin, end)
-template <typename Iter> bytes to_bytes(const Iter begin, const Iter end)
+template <typename Iter> inline bytes to_bytes(const Iter begin, const Iter end)
 {
     bytes decoded;
     size_t sz = 0;
@@ -76,7 +76,7 @@ template <typename Iter> bytes to_bytes(const Iter begin, const Iter end)
 
 // Note: Don't use it directly with raw string literals (const char*) since the terminating null
 // character is also considered
-template <typename T> bytes to_bytes(const T &t) { return to_bytes(std::begin(t), std::end(t)); }
+template <typename T> inline bytes to_bytes(const T &t) { return to_bytes(std::begin(t), std::end(t)); }
 
 } // namespace hex
 
@@ -89,7 +89,7 @@ const static byte ENCODE_TABLE[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
                                     'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                                     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
-template <typename Iter> bytes from_bytes(Iter begin, Iter end)
+template <typename Iter> inline bytes from_bytes(Iter begin, Iter end)
 {
     bytes encoded;
 
@@ -136,7 +136,7 @@ template <typename Iter> bytes from_bytes(Iter begin, Iter end)
     return encoded;
 }
 
-template <typename T> bytes from_bytes(const T &t)
+template <typename T> inline bytes from_bytes(const T &t)
 {
     return from_bytes(std::begin(t), std::end(t));
 }
@@ -144,7 +144,7 @@ template <typename T> bytes from_bytes(const T &t)
 
 // Convenience function to display bytes, displays non printable characters using the \x notation
 
-std::ostream &operator<<(std::ostream &os, const bytes &bytestr)
+inline std::ostream &operator<<(std::ostream &os, const bytes &bytestr)
 {
     for (const auto &byt : bytestr)
     {
@@ -176,4 +176,37 @@ std::ostream &operator<<(std::ostream &os, const bytes &bytestr)
         }
     }
     return os;
+}
+
+// Pads the input using the PKCS#7 Scheme, the returned bytes has a size which is a mutliple of
+// block size.
+// Even if the text length is an exact multiple of block size, padding is still applied
+inline bytes pad_pkcs7(const bytes &text, int block_size)
+{
+    if (block_size > 255)
+    {
+        throw std::logic_error("PKCS#7 Padding block size cannot be greater than 255 bytes");
+    }
+    bytes padded_text = text;
+    int n_padding_chars = block_size - (text.size() % block_size);
+    bytes temp(n_padding_chars, static_cast<byte>(n_padding_chars));
+
+    padded_text.insert(padded_text.end(), temp.begin(), temp.end());
+    return padded_text;
+}
+
+inline bytes fixed_XOR(bytes &b1, bytes &b2)
+{
+    if (b1.size() != b2.size())
+    {
+        throw std::logic_error("Buffers are not of equal size");
+    }
+    auto b1_iter = b1.begin();
+    auto b2_iter = b2.begin();
+    bytes result;
+    for (; b1_iter != b1.end() && b2_iter != b2.end(); ++b1_iter, ++b2_iter)
+    {
+        result.push_back(*b1_iter ^ *b2_iter);
+    }
+    return result;
 }
