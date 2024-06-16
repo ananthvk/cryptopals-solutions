@@ -76,7 +76,10 @@ template <typename Iter> inline bytes to_bytes(const Iter begin, const Iter end)
 
 // Note: Don't use it directly with raw string literals (const char*) since the terminating null
 // character is also considered
-template <typename T> inline bytes to_bytes(const T &t) { return to_bytes(std::begin(t), std::end(t)); }
+template <typename T> inline bytes to_bytes(const T &t)
+{
+    return to_bytes(std::begin(t), std::end(t));
+}
 
 } // namespace hex
 
@@ -193,6 +196,21 @@ inline bytes pad_pkcs7(const bytes &text, int block_size)
 
     padded_text.insert(padded_text.end(), temp.begin(), temp.end());
     return padded_text;
+}
+
+inline bytes unpad_pkcs7(const bytes &text, int block_size)
+{
+    if (block_size > 255)
+    {
+        throw std::logic_error("PKCS#7 Padding block size cannot be greater than 255 bytes");
+    }
+    // Get number of padding bytes
+    int padding_bytes = static_cast<int>(text.back());
+    if (padding_bytes > text.size())
+    {
+        throw std::runtime_error("Number of padding bytes > text size");
+    }
+    return bytes(text.begin(), text.begin() + text.size() - padding_bytes);
 }
 
 inline bytes fixed_XOR(bytes &b1, bytes &b2)
