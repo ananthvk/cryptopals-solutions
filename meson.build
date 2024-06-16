@@ -1,5 +1,5 @@
 project(
-    'dsa',
+    'cryptopals',
     'cpp',
     version: '0.1',
     default_options: ['warning_level=3', 'cpp_std=c++14'],
@@ -29,40 +29,19 @@ if meson.get_compiler('cpp').get_id() == 'clang'
         '-D_FORTIFY_SOURCE=2',
         '-fstack-protector',
     ]
-else
-    extra_args = []
+    add_project_arguments(extra_args, language: ['cpp'])
 endif
 
 gtest_dep = dependency('gtest')
 openssl_dep = dependency('openssl')
-
-srcs = [
-    'challenge1',
-    'challenge2',
-    'challenge3',
-    'challenge4',
-    'challenge5',
-    'challenge6',
-    'challenge7',
-    'challenge8'
-]
-
-foreach s : srcs
-    e = executable(
-        s,
-        sources: ['set1/' + s + '.cpp'],
-        dependencies: [gtest_dep, openssl_dep],
-        include_directories: ['include'],
-        cpp_args: extra_args,
-    )
-    test(s, e, workdir: meson.current_source_dir())
-endforeach
+include_dirs = include_directories('include')
 
 t = executable(
     'test_crypto',
     sources: ['tests/test_crypto.cpp'],
     dependencies: [gtest_dep],
-    include_directories: ['include'],
-    cpp_args: extra_args,
+    include_directories: include_dirs,
 )
 test('test_crypto', t, workdir: meson.current_source_dir())
+
+subdir('set1')
