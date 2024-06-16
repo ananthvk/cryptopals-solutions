@@ -104,8 +104,8 @@ int main()
     {
         auto encrypted = random_encrypter(plaintext, mode);
         auto guessed = oracle(encrypted);
-        // std::cout << ((mode == ECB) ? "ECB" : "CBC") << " " << ((guessed == ECB) ? "ECB" : "CBC")
-        //           << " " << hex::from_bytes(encrypted) << std::endl;
+        std::cout << ((mode == ECB) ? "ECB" : "CBC") << " " << ((guessed == ECB) ? "ECB" : "CBC")
+                  << " " << hex::from_bytes(encrypted) << std::endl;
         if (guessed != mode)
         {
             failures++;
