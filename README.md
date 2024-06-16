@@ -1,4 +1,4 @@
-# dsa
+# cryptopals-solutions
 
 This repo contains my solutions to [https://cryptopals.com/](https://cryptopals.com/) challenges.
 
@@ -10,7 +10,7 @@ Clone the repository
 
 ```
 $ git clone https://github.com/ananthvk/cryptopals-solutions
-$ cd dsa
+$ cd cryptopals-solutions
 ```
 
 Then build and run the tests
