@@ -1,6 +1,7 @@
 srcs = [
     'challenge9',
     'challenge10',
+    'challenge11',
 ]
 
 foreach s : srcs

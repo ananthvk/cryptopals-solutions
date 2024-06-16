@@ -70,11 +70,6 @@ std::string ciphertext_s =
     "be0f4c9c718239f3a346aa74546c804b5e40543d904b557a7e1462989495c93e90b866fcb4a46c97637e6b65f37b7e"
     "af80c870ed72bbce1fff8c2d87";
 
-void handleErrors(void)
-{
-    ERR_print_errors_fp(stderr);
-    abort();
-}
 
 int main()
 {
