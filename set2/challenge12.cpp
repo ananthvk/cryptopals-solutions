@@ -37,7 +37,8 @@ bytes buildblock(const bytes &last_bytes)
     bytes buffer;
     if (last_bytes.size() == block_size)
     {
-        buffer = last_bytes;
+        buffer = bytes(last_bytes.begin() + 1, last_bytes.end());
+        buffer.push_back('A');
     }
     else if (last_bytes.size() == 0)
     {
@@ -45,7 +46,8 @@ bytes buildblock(const bytes &last_bytes)
     }
     else if (last_bytes.size() > block_size)
     {
-        buffer = bytes(last_bytes.begin() + (last_bytes.size() - block_size), last_bytes.end());
+        buffer = bytes(last_bytes.begin() + (last_bytes.size() - block_size) + 1, last_bytes.end());
+        buffer.push_back('A');
     }
     else
     {
@@ -91,25 +93,32 @@ int main()
     // After a few iterations, the first block 0ed3c5d9eb279a6625bf95706c609d55 remains unchanged,
     // so the blocksize used is 16 bytes
 
-    bytes decoded;
-    bytes b(block_size - 1, 'A');
+    // Determine the number of blocks by calling the oracle with no bytes
+    int nbytes = oracle(bytes()).size();
+    int nblocks = nbytes / block_size;
 
-    for (int i = 0; i < 16; i++)
+    bytes decoded;
+    for (int j = 0; j < nblocks; j++)
     {
-        auto dict = build_dictionary(decoded);
-        auto ciphertext = oracle(b);
-        auto it = dict.find(get_nth_block(ciphertext, 0));
-        if (it != dict.end())
+        bytes b(block_size - 1, 'A');
+        for (int i = 0; i < 16; i++)
         {
-            decoded.push_back(it->second);
+            auto dict = build_dictionary(decoded);
+            auto ciphertext = oracle(b);
+            auto it = dict.find(get_nth_block(ciphertext, j));
+            if (it != dict.end())
+            {
+                decoded.push_back(it->second);
+            }
+            else
+            {
+                std::cout << decoded << std::endl;
+                std::cout << "NOT FOUND";
+                return 1;
+            }
+            if (!b.empty())
+                b.pop_back();
         }
-        else
-        {
-            std::cout << "NOT FOUND" << std::endl;
-            return 1;
-        }
-        if (!b.empty())
-            b.pop_back();
-        std::cout << decoded << std::endl;
     }
+    std::cout << decoded << std::endl;
 }
